@@ -15,7 +15,7 @@ class LoginController extends Controller
         try{
 
             if(!$token=auth(guard:'api')->attempt($credentials)){
-                return response()->json(['error'=>'Unauthorized'],401);
+                return response()->json(['error'=>'Usuario o contraseña incorrectos'],401);
             }
             $user=auth(guard:'api')->user();
             return response()->json([
