@@ -12,7 +12,7 @@ class LogoutController extends Controller
     {
         try {
             auth(guard:'api')->logout();
-            return response()->json(['message' => 'Successfully logged out']);
+            return response()->json(['message' => 'Sesión cerrada correctamente']);
         } catch (JWTException $e) {
             return response()->json(['error' => 'Failed to logout, please try again'], 500);
         }

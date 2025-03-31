@@ -15,6 +15,8 @@ Route::group(['middleware' => 'api', 'prefix' => 'auth'], function () {
 
 Route::middleware(['isAuth'])->group(function () {
     Route::get('/users',[UserController::class,'index']);
+    Route::get('/users/{username}',[UserController::class,'show']);
+    Route::put('/users/{id}',[UserController::class,'update']);
     Route::post('logout', action:LogoutController::class);
 
 });
