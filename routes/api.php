@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ImageController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\LogoutController;
 use App\Http\Controllers\UserController;
@@ -20,4 +21,6 @@ Route::middleware(['isAuth'])->group(function () {
     Route::post('logout', action:LogoutController::class);
 
 });
+
+Route::get('/imagen/{filename}', [ImageController::class, 'show']);
 

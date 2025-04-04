@@ -7,6 +7,7 @@ use App\Http\Requests\UserRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
@@ -47,6 +48,19 @@ class UserController extends Controller
 
             if ($request->has('password')) {
                 $user->password = bcrypt($request->password);
+            }
+
+             // Manejar la actualización de la imagen
+             if ($request->hasFile('image')) {
+                // Eliminar la imagen anterior si existe
+                if ($user->image) {
+                    Storage::disk('public')->delete('perfiles/' . $user->image);
+                }
+        
+                // Almacenar la nueva imagen
+                $imagePath = $request->file('image')->store('perfiles', 'public');
+                $imageName = basename($imagePath);
+                $user->image = $imageName;
             }
 
             $user->save();
