@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\UpdateUserRequest;
 use App\Http\Requests\UserRequest;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -35,14 +37,11 @@ class UserController extends Controller
         return response()->json(compact('user', 'token'), 201);
     }
 
-    public function update(Request $request, $id)
+    public function update(UpdateUserRequest $request, $id)
     {
-        $user = User::find($id);
-
-        if (!$user) {
-            return response()->json(['error' => 'Usuario no encontrado'], 404);
-        }
+        
         try {
+            $user = User::findOrFail($id);
             // Solo actualiza los campos que vienen en la solicitud
             $user->fill($request->only(['name', 'lastname', 'email', 'username', 'password']));
 
@@ -69,7 +68,11 @@ class UserController extends Controller
                 'message' => 'Usuario actualizado satisfactoriamente',
                 'user' => $user->fresh()
             ], 200);
-        } catch (\Exception $e) {
+        } 
+        catch(ModelNotFoundException $e) {
+            return response()->json(['error' => 'Usuario no encontrado'], 404);
+        }
+        catch (\Exception $e) {
             return response()->json(['error' => 'Error al actualizar el usuario'], 500);
         }
     }
