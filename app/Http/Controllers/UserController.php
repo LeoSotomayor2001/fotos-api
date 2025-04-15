@@ -4,13 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\UpdateUserRequest;
 use App\Http\Requests\UserRequest;
+use App\Http\Resources\UserResource;
 use App\Models\User;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Validator;
+
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class UserController extends Controller
@@ -18,7 +18,7 @@ class UserController extends Controller
     public function index(Request $request)
     {
         return response()->json([
-            'users' => User::all()
+            'users' => UserResource::collection(User::all())
         ]);
     }
 
@@ -66,7 +66,7 @@ class UserController extends Controller
 
             return response()->json([
                 'message' => 'Usuario actualizado satisfactoriamente',
-                'user' => $user->fresh()
+                'user' => new UserResource($user)
             ], 200);
         } 
         catch(ModelNotFoundException $e) {
@@ -83,6 +83,6 @@ class UserController extends Controller
         if (!$user) {
             return response()->json(['error' => 'Usuario no encontrado'], 404);
         }
-        return response()->json($user);
+        return response()->json(new UserResource($user));
     }
 }

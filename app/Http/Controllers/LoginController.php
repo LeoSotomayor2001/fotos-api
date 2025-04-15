@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\UserResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Tymon\JWTAuth\Exceptions\JWTException;
@@ -21,7 +22,7 @@ class LoginController extends Controller
             return response()->json([
                 'message' => 'Login successful!',
                 'token' => $token,
-                'user' => $user
+                'user' => new UserResource($user)
             ], 200);
         }
         catch (JWTException $e) {
