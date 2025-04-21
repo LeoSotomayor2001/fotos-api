@@ -19,7 +19,7 @@ Route::middleware(['isAuth'])->group(function () {
     //Rutas de los usuarios
     Route::get('/users',[UserController::class,'index']);
     Route::get('/users/{username}',[UserController::class,'show']);
-    Route::put('/users/{id}',[UserController::class,'update']);
+    Route::post('/users/{id}',[UserController::class,'update']);
     //Post
     Route::post('/posts', [PostController::class, 'store']);
 

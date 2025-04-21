@@ -21,7 +21,7 @@ class UserResource extends JsonResource
             'email' => $this->email,
             'username' => $this->username,
             'image' => $this->image,
-            'posts' => PostResource::collection($this->posts),
+            'posts' => PostResource::collection($this->posts()->orderBy('created_at', 'desc')->get()),
         ];
     }
 }
