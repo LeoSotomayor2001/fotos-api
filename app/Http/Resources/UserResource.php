@@ -22,6 +22,7 @@ class UserResource extends JsonResource
             'username' => $this->username,
             'image' => $this->image,
             'posts' => PostResource::collection($this->posts()->orderBy('created_at', 'desc')->get()),
+            'postCount' => $this->posts()->count(),
         ];
     }
 }
