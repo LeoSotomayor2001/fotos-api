@@ -21,6 +21,7 @@ Route::middleware(['isAuth'])->group(function () {
     Route::get('/users/{username}',[UserController::class,'show']);
     Route::post('/users/{id}',[UserController::class,'update']);
     //Post
+    Route::get('/posts/{id}', [PostController::class, 'show']);
     Route::post('/posts', [PostController::class, 'store']);
 
     //Logout

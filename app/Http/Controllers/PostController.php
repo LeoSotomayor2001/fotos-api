@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\PostRequest;
+use App\Http\Resources\PostResource;
 use App\Models\Post;
 use Illuminate\Http\Request;
 
@@ -44,5 +45,10 @@ class PostController extends Controller
             'message' => 'Post creado exitosamente',
             'post' => $post
         ], 201);
+    }
+
+    public function show(string $id) {
+        $post=Post::find($id);
+        return response()->json(new PostResource($post));
     }
 }
