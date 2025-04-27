@@ -33,8 +33,9 @@ class UserController extends Controller
             'password' => Hash::make($request->get('password')),
         ]);
         $token = JWTAuth::fromUser($user);
+        $success = true;
 
-        return response()->json(compact('user', 'token'), 201);
+        return response()->json(compact('user', 'token','success'), 201);
     }
 
     public function update(UpdateUserRequest $request, $id)

@@ -6,6 +6,7 @@ use App\Http\Requests\PostRequest;
 use App\Http\Resources\PostResource;
 use App\Models\Post;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class PostController extends Controller
 {
@@ -49,6 +50,25 @@ class PostController extends Controller
 
     public function show(string $id) {
         $post=Post::find($id);
+        if(!$post){
+            return response()->json([
+                'error' => 'Publicación no encontrada'
+            ], 404);
+        }
         return response()->json(new PostResource($post));
+    }
+
+    public function destroy(string $id){
+        $post=Post::find($id);
+        Gate::authorize('delete', $post);
+        if(!$post){
+            return response()->json([
+                'error' => 'Publicación no encontrada'
+            ], 404);
+        }
+        $post->delete();
+        return response()->json([
+            'message' => 'Publicación eliminada exitosamente'
+        ]);
     }
 }

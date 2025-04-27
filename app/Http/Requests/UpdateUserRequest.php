@@ -41,7 +41,8 @@ class UpdateUserRequest extends FormRequest
                 'min:3',
                 Rule::unique('users', 'username')->ignore($userId)
             ],
-            'image' => ['nullable', 'image', 'max:2048', 'mimes:jpeg,png,jpg,gif,svg,webp'],
+           'image' => ['nullable', 'image', 'max:102400', 'mimes:jpeg,png,jpg,gif,svg,webp'],
+
         ];
     }
 

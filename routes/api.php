@@ -23,6 +23,7 @@ Route::middleware(['isAuth'])->group(function () {
     //Post
     Route::get('/posts/{id}', [PostController::class, 'show']);
     Route::post('/posts', [PostController::class, 'store']);
+    Route::delete('/posts/{id}', [PostController::class, 'destroy']);
 
     //Logout
     Route::post('logout', action:LogoutController::class);
