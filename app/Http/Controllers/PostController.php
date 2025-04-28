@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\PostRequest;
+use App\Http\Requests\UpdatePostRequest;
 use App\Http\Resources\PostResource;
 use App\Models\Post;
 use Illuminate\Http\Request;
@@ -58,14 +59,31 @@ class PostController extends Controller
         return response()->json(new PostResource($post));
     }
 
-    public function destroy(string $id){
+    public function update(UpdatePostRequest $request,string $id){
         $post=Post::find($id);
-        Gate::authorize('delete', $post);
+
         if(!$post){
             return response()->json([
                 'error' => 'Publicación no encontrada'
             ], 404);
         }
+        Gate::authorize('update', $post);
+
+        $post->update($request->all());
+
+        return response()->json([
+            'message' => 'Publicación actualizada exitosamente',
+        ]);
+    }
+
+    public function destroy(string $id){
+        $post=Post::find($id);
+        if(!$post){
+            return response()->json([
+                'error' => 'Publicación no encontrada'
+            ], 404);
+        }
+        Gate::authorize('delete', $post);
         $post->delete();
         return response()->json([
             'message' => 'Publicación eliminada exitosamente'
