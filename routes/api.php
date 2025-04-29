@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\ImageController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\LogoutController;
@@ -26,6 +27,8 @@ Route::middleware(['isAuth'])->group(function () {
     Route::post('/posts/{id}', [PostController::class, 'update']);
     Route::delete('/posts/{id}', [PostController::class, 'destroy']);
 
+    //Comentarios 
+    Route::post('/comments', [CommentController::class, 'store']);
     //Logout
     Route::post('logout', action:LogoutController::class);
 

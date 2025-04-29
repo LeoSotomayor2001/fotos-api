@@ -20,7 +20,9 @@ class PostResource extends JsonResource
             'description' => $this->description,
             'file' => $this->file,
             'file_type' => $this->file_type,
-            'user_id' => $this->user_id
+            'user_id' => $this->user_id,
+            'comments' => CommentResource::collection($this->comments),
+            'commentsCount' => $this->comments()->count()
         ];
     }
 }
