@@ -21,7 +21,7 @@ class PostResource extends JsonResource
             'file' => $this->file,
             'file_type' => $this->file_type,
             'user_id' => $this->user_id,
-            'comments' => CommentResource::collection($this->comments),
+            'comments' => CommentResource::collection($this->comments()->orderBy('created_at', 'desc')->get()),
             'commentsCount' => $this->comments()->count()
         ];
     }

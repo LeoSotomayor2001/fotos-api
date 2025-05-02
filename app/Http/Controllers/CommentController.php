@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\CommentRequest;
 use App\Models\Comment;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
+
 
 class CommentController extends Controller
 {
@@ -17,12 +17,14 @@ class CommentController extends Controller
     }
 
     public function update(CommentRequest $request, Comment $comment){
+        Gate::authorize('update',$comment);
         $comment->update($request->all());
 
         return response()->json('Comentario actualizado correctamente',200);
     }
 
     public function destroy(Comment $comment){
+        Gate::authorize('delete',$comment);
         try{
             $comment->delete();
             return response()->json('Comentario eliminado correctamente',200);
