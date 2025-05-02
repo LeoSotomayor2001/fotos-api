@@ -28,7 +28,7 @@ Route::middleware(['isAuth'])->group(function () {
     Route::delete('/posts/{id}', [PostController::class, 'destroy']);
 
     //Comentarios 
-    Route::post('/comments', [CommentController::class, 'store']);
+    Route::apiResource('/comments',CommentController::class);
     //Logout
     Route::post('logout', action:LogoutController::class);
 

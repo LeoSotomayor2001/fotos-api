@@ -23,7 +23,7 @@ class UpdatePostRequest extends FormRequest
     {
         return [
             'title' => 'sometimes|string|max:255',
-            'description' => 'sometimes|string|max:255',
+            'description' => 'sometimes|string',
             'file' => 'nullable|file|mimes:jpeg,png,jpg,gif,webp,mp4,mov,avi|max:102400',
             'user_id' => 'sometimes|exists:users,id',
         ];
