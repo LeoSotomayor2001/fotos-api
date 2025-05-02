@@ -86,4 +86,31 @@ class UserController extends Controller
         }
         return response()->json(new UserResource($user));
     }
+
+    //funcion para buscar usuarios por nombre, correo o username
+    public function search(Request $request)
+    {
+        $query = $request->input('query');
+        $users = User::where('name', 'LIKE', "%$query%")
+            ->orWhere('lastname', 'LIKE', "%$query%")
+            ->orWhere('email', 'LIKE', "%$query%")
+            ->orWhere('username', 'LIKE', "%$query%")
+            ->get();
+
+        return response()->json([
+            'users' => UserResource::collection($users)
+        ]);
+    }
+    public function destroy($id)
+    {
+        try {
+            $user = User::findOrFail($id);
+            $user->delete();
+            return response()->json(['message' => 'Usuario eliminado satisfactoriamente'], 200);
+        } catch (ModelNotFoundException $e) {
+            return response()->json(['error' => 'Usuario no encontrado'], 404);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error al eliminar el usuario'], 500);
+        }
+    }
 }
