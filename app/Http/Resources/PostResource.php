@@ -14,6 +14,7 @@ class PostResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $user = $request->user();
         return [
             'id' => $this->id,
             'title' => $this->title,
@@ -31,6 +32,8 @@ class PostResource extends JsonResource
                 'angry' => $this->reactions()->where('type', 'angry')->count(),
             ],
             'reactionsCount' => $this->reactions()->count(),
+            'userHasReacted' => $user ? $this->reactions()->where('user_id', $user->id)->exists() : false, // ✅ Verifica si el usuario reaccionó
+            'userReactionType' => $user ? $this->reactions()->where('user_id', $user->id)->value('type') : null, // ✅ Muestra el tipo de reacción
         ];
     }
 }

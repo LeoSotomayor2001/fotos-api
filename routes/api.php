@@ -26,6 +26,7 @@ Route::middleware(['isAuth'])->group(function () {
     
     //Reacciones
     Route::post('/posts/reaction', [ReactionController::class, 'store']);
+    Route::delete('/posts/reaction', [ReactionController::class, 'destroy']);
     //Post
     Route::get('/posts/{id}', [PostController::class, 'show']);
     Route::post('/posts', [PostController::class, 'store']);
