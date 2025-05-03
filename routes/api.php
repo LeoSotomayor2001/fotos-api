@@ -5,6 +5,7 @@ use App\Http\Controllers\ImageController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\LogoutController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\ReactionController;
 use App\Http\Controllers\UserController;
 
 use Illuminate\Support\Facades\Route;
@@ -22,11 +23,15 @@ Route::middleware(['isAuth'])->group(function () {
     Route::get('/users/{username}',[UserController::class,'show']);
     Route::post('/users/search',[UserController::class,'search']);
     Route::post('/users/{id}',[UserController::class,'update']);
+    
+    //Reacciones
+    Route::post('/posts/reaction', [ReactionController::class, 'store']);
     //Post
     Route::get('/posts/{id}', [PostController::class, 'show']);
     Route::post('/posts', [PostController::class, 'store']);
     Route::post('/posts/{id}', [PostController::class, 'update']);
     Route::delete('/posts/{id}', [PostController::class, 'destroy']);
+
 
     //Comentarios 
     Route::apiResource('/comments',CommentController::class);

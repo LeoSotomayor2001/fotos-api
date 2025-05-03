@@ -26,10 +26,10 @@ class LoginController extends Controller
             ], 200);
         }
         catch (JWTException $e) {
-            return response()->json(['error' => 'Could not create token'], 500);
+            return response()->json(['error' => 'No se ha podido iniciar sesión' , ], 500);
         }
         catch (\Exception $e) {
-            return response()->json(['error' => 'Could not create token'], 500);
+            return response()->json(['error' => 'Oops ha ocurrido un error'], 500);
         }
     }
 }

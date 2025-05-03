@@ -22,7 +22,15 @@ class PostResource extends JsonResource
             'file_type' => $this->file_type,
             'user_id' => $this->user_id,
             'comments' => CommentResource::collection($this->comments()->orderBy('created_at', 'desc')->get()),
-            'commentsCount' => $this->comments()->count()
+            'commentsCount' => $this->comments()->count(),
+            'reactions' => [
+                'like' => $this->reactions()->where('type', 'like')->count(),
+                'love' => $this->reactions()->where('type', 'love')->count(),
+                'haha' => $this->reactions()->where('type', 'haha')->count(),
+                'sad' => $this->reactions()->where('type', 'sad')->count(),
+                'angry' => $this->reactions()->where('type', 'angry')->count(),
+            ],
+            'reactionsCount' => $this->reactions()->count(),
         ];
     }
 }
