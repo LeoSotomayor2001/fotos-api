@@ -12,7 +12,24 @@ use Illuminate\Support\Facades\Gate;
 class PostController extends Controller
 {
 
-    public function index() {}
+    public function index(Request $request)
+    {
+        $authUser = $request->user(); // ✅ Obtener usuario autenticado
+
+        // Obtener los IDs de los usuarios que sigue
+        $followingIds = $authUser->followings()->select('users.id')->pluck('id');
+
+
+        // Obtener los posts de esos usuarios y ordenarlos por fecha
+        $posts = Post::whereIn('user_id', $followingIds)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json([
+            'posts' => PostResource::collection($posts),
+        ]);
+    }
+
 
     public function store(PostRequest $request)
     {
@@ -49,9 +66,10 @@ class PostController extends Controller
         ], 201);
     }
 
-    public function show(string $id) {
-        $post=Post::find($id);
-        if(!$post){
+    public function show(string $id)
+    {
+        $post = Post::find($id);
+        if (!$post) {
             return response()->json([
                 'error' => 'Publicación no encontrada'
             ], 404);
@@ -59,10 +77,11 @@ class PostController extends Controller
         return response()->json(new PostResource($post));
     }
 
-    public function update(UpdatePostRequest $request,string $id){
-        $post=Post::find($id);
+    public function update(UpdatePostRequest $request, string $id)
+    {
+        $post = Post::find($id);
 
-        if(!$post){
+        if (!$post) {
             return response()->json([
                 'error' => 'Publicación no encontrada'
             ], 404);
@@ -76,9 +95,10 @@ class PostController extends Controller
         ]);
     }
 
-    public function destroy(string $id){
-        $post=Post::find($id);
-        if(!$post){
+    public function destroy(string $id)
+    {
+        $post = Post::find($id);
+        if (!$post) {
             return response()->json([
                 'error' => 'Publicación no encontrada'
             ], 404);

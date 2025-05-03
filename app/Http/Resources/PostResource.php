@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -15,6 +16,7 @@ class PostResource extends JsonResource
     public function toArray(Request $request): array
     {
         $user = $request->user();
+        Carbon::setLocale('es');
         return [
             'id' => $this->id,
             'title' => $this->title,
@@ -22,8 +24,11 @@ class PostResource extends JsonResource
             'file' => $this->file,
             'file_type' => $this->file_type,
             'user_id' => $this->user_id,
+            'username' => $this->user->username,
+            'userImage' => $this->user->image,
             'comments' => CommentResource::collection($this->comments()->orderBy('created_at', 'desc')->get()),
             'commentsCount' => $this->comments()->count(),
+            'created' => Carbon::parse($this->created_at)->diffForHumans(),
             'reactions' => [
                 'like' => $this->reactions()->where('type', 'like')->count(),
                 'love' => $this->reactions()->where('type', 'love')->count(),

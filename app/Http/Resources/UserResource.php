@@ -14,6 +14,8 @@ class UserResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $authUser = auth(guard:'api')->user(); 
+    
         return [
             'id' => $this->id,
             'name' => $this->name,
@@ -23,6 +25,11 @@ class UserResource extends JsonResource
             'image' => $this->image,
             'posts' => PostResource::collection($this->posts()->orderBy('created_at', 'desc')->get()),
             'postCount' => $this->posts()->count(),
+            'followersCount' => $this->followers()->count(),
+            'followingCount' => $this->followings()->count(),
+            'isFollowing' => $this->followers()->where('follower_id', $authUser->id)->exists(),
+
         ];
     }
+    
 }
