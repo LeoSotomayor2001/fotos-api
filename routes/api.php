@@ -42,6 +42,7 @@ Route::middleware(['isAuth'])->group(function () {
     Route::post('logout', action: LogoutController::class);
 
     //Siguiendo a usuarios
+    Route::get('/followers/suggested', [UserController::class, 'suggestedUsers']);
     Route::post('/{user:username}/follow', [FollowerController::class, 'store']);
     Route::delete('/{user:username}/follow', [FollowerController::class, 'destroy']);
 });

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\UpdateUserRequest;
 use App\Http\Requests\UserRequest;
+use App\Http\Resources\SuggestedUserResource;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -22,6 +23,32 @@ class UserController extends Controller
         ]);
     }
 
+    public function suggestedUsers(Request $request)
+    {
+        $authUser = $request->user(); // ✅ Usuario autenticado
+
+        // Obtener los IDs de los usuarios que sigue
+        $followingIds = $authUser->followings()->select('users.id')->pluck('id');
+
+        // Obtener los IDs de los usuarios seguidos por los que sigue el autenticado
+        $secondLevelIds = User::whereIn('id', $followingIds)
+            ->with('followings')
+            ->get()
+            ->pluck('followings')
+            ->flatten()
+            ->pluck('id')
+            ->unique();
+
+        // Filtrar para excluir a los que ya sigue el usuario autenticado
+        $suggestedUsers = User::whereIn('id', $secondLevelIds)
+            ->whereNotIn('id', $followingIds)
+            ->where('id', '!=', $authUser->id)
+            ->get();
+
+        return response()->json([
+            'suggestedUsers' => SuggestedUserResource::collection($suggestedUsers)
+        ]);
+    }
     public function store(UserRequest $request)
     {
 
@@ -35,12 +62,12 @@ class UserController extends Controller
         $token = JWTAuth::fromUser($user);
         $success = true;
 
-        return response()->json(compact('user', 'token','success'), 201);
+        return response()->json(compact('user', 'token', 'success'), 201);
     }
 
     public function update(UpdateUserRequest $request, $id)
     {
-        
+
         try {
             $user = User::findOrFail($id);
             // Solo actualiza los campos que vienen en la solicitud
@@ -50,13 +77,13 @@ class UserController extends Controller
                 $user->password = bcrypt($request->password);
             }
 
-             // Manejar la actualización de la imagen
-             if ($request->hasFile('image')) {
+            // Manejar la actualización de la imagen
+            if ($request->hasFile('image')) {
                 // Eliminar la imagen anterior si existe
                 if ($user->image) {
                     Storage::disk('public')->delete('perfiles/' . $user->image);
                 }
-        
+
                 // Almacenar la nueva imagen
                 $imagePath = $request->file('image')->store('perfiles', 'public');
                 $imageName = basename($imagePath);
@@ -69,11 +96,9 @@ class UserController extends Controller
                 'message' => 'Usuario actualizado satisfactoriamente',
                 'user' => new UserResource($user)
             ], 200);
-        } 
-        catch(ModelNotFoundException $e) {
+        } catch (ModelNotFoundException $e) {
             return response()->json(['error' => 'Usuario no encontrado'], 404);
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             return response()->json(['error' => 'Error al actualizar el usuario'], 500);
         }
     }
