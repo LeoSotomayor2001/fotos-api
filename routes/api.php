@@ -5,6 +5,7 @@ use App\Http\Controllers\FollowerController;
 use App\Http\Controllers\ImageController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\LogoutController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ReactionController;
 use App\Http\Controllers\UserController;
@@ -45,6 +46,11 @@ Route::middleware(['isAuth'])->group(function () {
     Route::get('/followers/suggested', [UserController::class, 'suggestedUsers']);
     Route::post('/{user:username}/follow', [FollowerController::class, 'store']);
     Route::delete('/{user:username}/follow', [FollowerController::class, 'destroy']);
+
+    //Notificaciones
+    Route::get('/notifications', [NotificationController::class, 'notifications']);
+    Route::get('/notifications/{id}', [NotificationController::class, 'markAsRead']);
+    Route::post('/notifications/mark-all-as-read', [NotificationController::class, 'markAllAsRead']);
 });
 
 Route::get('/imagen/{filename}', [ImageController::class, 'show']);

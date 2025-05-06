@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Post;
 use App\Models\Reaction;
+use App\Notifications\LikeNotification;
 use Illuminate\Http\Request;
 
 class ReactionController extends Controller
@@ -13,11 +15,16 @@ class ReactionController extends Controller
             'post_id' => 'required|exists:posts,id',
             'type' => 'required|in:like,love,haha,sad,angry',
         ]);
-    
+        $user= auth(guard:'api')->user();
+        $post=Post::find($request->post_id);
+
         $reaction = Reaction::updateOrCreate(
             ['user_id' => auth(guard:'api')->user()->id, 'post_id' => $request->post_id],
             ['type' => $request->type]
         );
+
+        // Notificar al usuario que ha reaccionado a su publicación
+        $post->user->notify(new LikeNotification($user, $post));
     
         return response()->json(['message' => 'Reacción guardada correctamente', 'reaction' => $reaction]);
     }
