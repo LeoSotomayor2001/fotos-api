@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\CommentRequest;
 use App\Models\Comment;
+use App\Models\Post;
+use App\Notifications\CommentNotification;
 use Illuminate\Support\Facades\Gate;
 
 
@@ -11,8 +13,13 @@ class CommentController extends Controller
 {
     public function store(CommentRequest $request){
         
-        Comment::create($request->all());
-
+        $comentario=Comment::create($request->all());
+        $publicacion=Post::find($request->post_id);
+        // Notifica al usuario que ha comentado en su publicación
+        if(auth(guard:'api')->user()->id != $publicacion->user_id){
+            $publicacion->user->notify(new CommentNotification($publicacion,$comentario));
+            
+        }
         return response()->json('Comentario creado correctamente',200);
     }
 
