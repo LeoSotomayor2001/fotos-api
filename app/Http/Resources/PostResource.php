@@ -26,7 +26,7 @@ class PostResource extends JsonResource
             'user_id' => $this->user_id,
             'username' => $this->user->username,
             'userImage' => $this->user->image,
-            'comments' => CommentResource::collection($this->comments()->orderBy('created_at', 'desc')->get()),
+            'comments' => CommentResource::collection($this->comments()->latest()->get()),
             'commentsCount' => $this->comments()->count(),
             'created' => Carbon::parse($this->created_at)->diffForHumans(),
             'reactions' => [

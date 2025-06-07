@@ -6,11 +6,19 @@ use App\Http\Requests\PostRequest;
 use App\Http\Requests\UpdatePostRequest;
 use App\Http\Resources\PostResource;
 use App\Models\Post;
+use App\Services\PostService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
 class PostController extends Controller
 {
+
+    protected $postService;
+
+    public function __construct(PostService $postService)
+    {
+        $this->postService = $postService;
+    }
 
     public function index(Request $request)
     {
@@ -22,7 +30,7 @@ class PostController extends Controller
 
         // Obtener los posts de esos usuarios y ordenarlos por fecha
         $posts = Post::whereIn('user_id', $followingIds)
-            ->orderBy('created_at', 'desc')
+            ->latest() // ✅ Ordenar por fecha de creación
             ->get();
 
         return response()->json([
@@ -33,36 +41,10 @@ class PostController extends Controller
 
     public function store(PostRequest $request)
     {
-        // Validación ya está en PostRequest
-        $data = $request->validated(); // Usar validated() en lugar de all()
-
-        // Crear el post primero con los datos básicos
-        $post = Post::create($data);
-
-        // Manejar el archivo si existe
-        if ($request->hasFile('file')) {
-            $file = $request->file('file');
-
-            if ($file->getSize() > 100 * 1024 * 1024) { // 100MB
-                return response()->json([
-                    'error' => 'El archivo excede el tamaño máximo permitido de 100MB'
-                ], 422);
-            }
-
-            // Almacena el archivo y obtén solo el nombre
-            $fileName = $file->storeAs('posts', $file->hashName(), 'public');
-            $fileName = basename($fileName); // Obtiene solo el nombre del archivo
-
-            $post->update([
-                'file' => $fileName, // Guarda solo 'asdasda.ext'
-                'file_type' => str($file->getMimeType())->before('/')
-            ]);
-        }
-
-
+        $data = $request->validated();
+        $this->postService->createPost($data, $request);
         return response()->json([
             'message' => 'Post creado exitosamente',
-            'post' => $post
         ], 201);
     }
 
