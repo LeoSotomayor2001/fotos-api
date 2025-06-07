@@ -7,9 +7,8 @@ use App\Http\Requests\UpdatePostRequest;
 use App\Http\Resources\PostResource;
 use App\Models\Post;
 use App\Services\PostService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
-
 class PostController extends Controller
 {
 
@@ -22,22 +21,12 @@ class PostController extends Controller
 
     public function index(Request $request)
     {
-        $authUser = $request->user(); // ✅ Obtener usuario autenticado
-
-        // Obtener los IDs de los usuarios que sigue
-        $followingIds = $authUser->followings()->select('users.id')->pluck('id');
-
-
-        // Obtener los posts de esos usuarios y ordenarlos por fecha
-        $posts = Post::whereIn('user_id', $followingIds)
-            ->latest() // ✅ Ordenar por fecha de creación
-            ->get();
+        $posts = $this->postService->getFollowingPosts($request);
 
         return response()->json([
-            'posts' => PostResource::collection($posts),
+            'posts' => $posts,
         ]);
     }
-
 
     public function store(PostRequest $request)
     {
@@ -61,17 +50,11 @@ class PostController extends Controller
 
     public function update(UpdatePostRequest $request, string $id)
     {
-        $post = Post::find($id);
-
-        if (!$post) {
-            return response()->json([
-                'error' => 'Publicación no encontrada'
-            ], 404);
+        $data = $request->validated();
+        $post = $this->postService->updatePost($data, $id);
+        if ($post instanceof JsonResponse) {
+            return $post; // En caso de error, retorna la respuesta JSON del servicio.
         }
-        Gate::authorize('update', $post);
-
-        $post->update($request->all());
-
         return response()->json([
             'message' => 'Publicación actualizada exitosamente',
         ]);
@@ -79,14 +62,10 @@ class PostController extends Controller
 
     public function destroy(string $id)
     {
-        $post = Post::find($id);
-        if (!$post) {
-            return response()->json([
-                'error' => 'Publicación no encontrada'
-            ], 404);
+        $post = $this->postService->deletePost($id);
+        if ($post instanceof JsonResponse) {
+            return $post; // En caso de error, retorna la respuesta JSON del servicio.
         }
-        Gate::authorize('delete', $post);
-        $post->delete();
         return response()->json([
             'message' => 'Publicación eliminada exitosamente'
         ]);

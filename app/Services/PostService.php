@@ -2,11 +2,28 @@
 
 namespace App\Services;
 
+use App\Http\Resources\PostResource;
 use App\Models\Post;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\ResourceCollection;
+use Illuminate\Support\Facades\Gate;
 
 class PostService
 {
+      public function getFollowingPosts(Request $request): ResourceCollection
+    {
+        $authUser = $request->user(); // ✅ Obtener usuario autenticado
+
+        // Obtener los IDs de los usuarios que sigue
+        $followingIds = $authUser->followings()->select('users.id')->pluck('id');
+
+        // Obtener los posts de esos usuarios y ordenarlos por fecha
+        $posts = Post::whereIn('user_id', $followingIds)
+            ->latest()
+            ->get();
+
+        return PostResource::collection($posts); // ✅ Retornar colección de recursos
+    }
     public function createPost(array $data, Request $request)
     {
         // Crear el post con los datos básicos
@@ -31,5 +48,35 @@ class PostService
                 'file_type' => str($file->getMimeType())->before('/')
             ]);
         }
+    }
+
+    public function updatePost(array $data, string $id)
+    {
+        $post = Post::find($id);
+
+        if (!$post) {
+            return response()->json([
+                'error' => 'Publicación no encontrada'
+            ], 404);
+        }
+
+        Gate::authorize('update', $post);
+
+        $post->update($data);
+
+        return $post;
+    }
+
+    public function deletePost(string $id)
+    {
+        $post = Post::find($id);
+        if (!$post) {
+            return response()->json([
+                'error' => 'Publicación no encontrada'
+            ], 404);
+        }
+        Gate::authorize('delete', $post);
+
+        $post->delete();
     }
 }
