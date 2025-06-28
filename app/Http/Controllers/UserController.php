@@ -28,7 +28,7 @@ class UserController extends Controller
         ]);
     }
 
-      public function suggestedUsers(Request $request)
+    public function suggestedUsers(Request $request)
     {
         $suggestedUsers = $this->userService->getSuggestedUsers($request);
 
